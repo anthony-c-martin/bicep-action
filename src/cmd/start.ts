@@ -1,14 +1,12 @@
-import { exec } from 'child_process';
-import util from 'util';
 import { writeFile } from 'fs/promises';
 import { Deployment, ResourceManagementClient, } from '@azure/arm-resources';
 import { DefaultAzureCredential } from "@azure/identity";
 import { executeSynchronous, isBaselineRecordEnabled } from "../utils";
-import { combine, getErrorTable, getResultHeading } from '../markdown';
+import { combine, getErrorTable, getResultHeading, getWhatIfTable } from '../markdown';
 import path from 'path';
 import { validate, whatif } from '../azure';
+import { bicepBuild } from '../bicep';
 
-const execAsync = util.promisify(exec);
 const root = path.resolve(__dirname, '../..');
 
 const subscriptionId = "d08e1a72-8180-4ed3-8125-9dff7376b0bd";
@@ -38,42 +36,36 @@ async function scenario(client: ResourceManagementClient, scenarioPath: string) 
 }
 
 async function generateValidateMarkdown(client: ResourceManagementClient, deployment: Deployment) {
+  const heading = 'Validate Results';
   const result = await validate(client, resourceGroup, deployment);
   switch (result.result) {
     case 'success':
       return combine([
-        getResultHeading('Validate Results', true),
+        getResultHeading(heading, true),
       ]);
     case 'error':
       return combine([
-        getResultHeading('Validate Results', false),
+        getResultHeading(heading, false),
         getErrorTable(result.error),
       ]);
   }
 }
 
 async function generateWhatIfMarkdown(client: ResourceManagementClient, deployment: Deployment) {
+  const heading = 'What-If Results';
   const result = await whatif(client, resourceGroup, deployment);
   switch (result.result) {
     case 'success':
       return combine([
-        getResultHeading('What-If Results', true),
+        getResultHeading(heading, true),
+        getWhatIfTable(result.value),
       ]);
     case 'error':
       return combine([
-        getResultHeading('What-If Results', false),
+        getResultHeading(heading, false),
         getErrorTable(result.error),
       ]);
   }
-}
-
-async function bicepBuild(path: string) {
-  const { stdout, stderr } = await execAsync(`bicep build --stdout ${path}`);
-
-  if (stderr) {
-    console.error(stderr);
-  }
-  return stdout;
 }
 
 function getDeployment(template: string): Deployment {
