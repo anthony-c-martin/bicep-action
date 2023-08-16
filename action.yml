@@ -1,0 +1,19 @@
+name: 'Bicep Action'
+description: 'Testing with Bicep Action'
+author: 'Anthony Martin'
+inputs:
+  subscriptionId:
+    required: true
+    description: 'Subscription Id'
+  resourceGroup:
+    required: true
+    description: 'Resource Group'
+  templateFile:
+    required: true
+    description: 'Template File'
+  parametersFile:
+    required: true
+    description: 'Parameters File'
+runs:
+  using: 'node16'
+  main: 'lib/main.js'
