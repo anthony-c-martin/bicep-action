@@ -1,0 +1,6 @@
+{
+  "arguments": "deployment group validate --subscription d08e1a72-8180-4ed3-8125-9dff7376b0bd --resource-group ant-test --template-file test/scenarios/preflight-error/main.bicep --parameters test/scenarios/preflight-error/main.bicepparam --output json --only-show-errors",
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "ERROR: {\"code\": \"InvalidTemplateDeployment\", \"message\": \"The template deployment 'main' is not valid according to the validation procedure. The tracking id is '82489048-9b25-4281-bee7-e8e39aefcd23'. See inner errors for details.\"}\n\nInner Errors: \n{\"code\": \"PreflightValidationCheckFailed\", \"message\": \"Preflight validation failed. Please refer to the details for the specific errors.\"}\n\nInner Errors: \n{\"code\": \"StorageAccountAlreadyTaken\", \"target\": \"stg\", \"message\": \"The storage account named stg is already taken.\"}\n"
+}

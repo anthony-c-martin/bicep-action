@@ -1,8 +1,7 @@
 import { ErrorResponse, WhatIfChange } from "@azure/arm-resources";
 
-
-export function getErrorTable(error: ErrorResponse) {
-  const errQueue = [error];
+export function getErrorTable(errors: ErrorResponse[]) {
+  const errQueue = errors.slice();
   const rows: string[][] = [];
 
   while (errQueue.length > 0) {
@@ -11,13 +10,14 @@ export function getErrorTable(error: ErrorResponse) {
       errQueue.push(...current.details);
     }
 
-    rows.push([current.code ?? '', current.message ?? '', current.target ?? '']);
+    rows.push([
+      current.code ?? "",
+      current.message ?? "",
+      current.target ?? ""
+    ]);
   }
 
-  return getTable(
-    ['Code', 'Message', 'Target'],
-    rows,
-  );
+  return getTable(["Code", "Message", "Target"], rows);
 }
 
 export function getResultHeading(title: string, success: boolean) {
@@ -27,26 +27,30 @@ export function getResultHeading(title: string, success: boolean) {
   } else {
     return `## ${title}
 ❌ Failure!`;
-  }  
+  }
 }
 
 export function getWhatIfTable(changes: WhatIfChange[]) {
   return getTable(
-    ['Resource Id', 'Change Type', 'Change'],
-    changes.map(x => [x.resourceId, x.changeType, `<pre>${JSON.stringify(x.delta)}</pre>`]),
+    ["Resource Id", "Change Type", "Change"],
+    changes.map((x) => [
+      x.resourceId,
+      x.changeType,
+      `<pre>${JSON.stringify(x.delta)}</pre>`
+    ])
   );
 }
 
 export function combine(values: string[]) {
-  return values.join('\n\n');
+  return values.join("\n\n");
 }
 
 function getTable(header: string[], rows: string[][]) {
   const mdRows = [
-    `| ${header.join(' | ')} |`,
-    `|${header.map(() => '-').join('|')} |`,
-    ...(rows.map(row => `| ${row.join(' | ')} |`))
+    `| ${header.join(" | ")} |`,
+    `|${header.map(() => "-").join("|")} |`,
+    ...rows.map((row) => `| ${row.join(" | ")} |`)
   ];
 
-  return mdRows.join('\n');
+  return mdRows.join("\n");
 }

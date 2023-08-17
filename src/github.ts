@@ -14,13 +14,15 @@ export async function addOrUpdateComment(comment: string) {
   const { data: comments } = await rest.issues.listComments({
     owner,
     repo,
-    issue_number,
+    issue_number
   });
 
   const filteredComment = comments.filter(
-    x => x.user?.login === context.actor &&
+    (x) =>
+      x.user?.login === context.actor &&
       x.body &&
-      x.body.includes(commentIdentifier));
+      x.body.includes(commentIdentifier)
+  );
 
   const body = `${commentIdentifier}${comment}`;
   if (filteredComment) {

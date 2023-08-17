@@ -22,11 +22,11 @@ const exec_1 = __nccwpck_require__(1514);
 class AzCli {
     execute(parameters) {
         return __awaiter(this, void 0, void 0, function* () {
-            const azPath = yield (0, io_1.which)('az');
+            const azPath = yield (0, io_1.which)("az");
             return yield (0, exec_1.getExecOutput)(azPath, parameters, {
                 silent: true,
                 failOnStdErr: false,
-                ignoreReturnCode: true,
+                ignoreReturnCode: true
             });
         });
     }
@@ -35,16 +35,19 @@ exports.AzCli = AzCli;
 function validate(wrapper, params) {
     return __awaiter(this, void 0, void 0, function* () {
         const parameters = [
-            'deployment',
-            'group',
-            'validate',
-            ...(params.managementGroup ? ['--management-group', params.managementGroup] : []),
-            ...(params.subscriptionId ? ['--subscription', params.subscriptionId] : []),
-            ...(params.resourceGroup ? ['--resource-group', params.resourceGroup] : []),
-            ...(params.deploymentName ? ['--name', params.deploymentName] : []),
-            ...(['--template-file', params.templateFile]),
-            ...(params.parametersFile ? ['--parameters', params.parametersFile] : []),
-            ...(['--output', 'json'])
+            "deployment",
+            "group",
+            "validate",
+            ...(params.managementGroup
+                ? ["--management-group", params.managementGroup]
+                : []),
+            ...(params.subscriptionId ? ["--subscription", params.subscriptionId] : []),
+            ...(params.resourceGroup ? ["--resource-group", params.resourceGroup] : []),
+            ...(params.deploymentName ? ["--name", params.deploymentName] : []),
+            ...["--template-file", params.templateFile],
+            ...(params.parametersFile ? ["--parameters", params.parametersFile] : []),
+            ...["--output", "json"],
+            ...['--only-show-errors'],
         ];
         return yield wrapper.execute(parameters);
     });
@@ -53,16 +56,19 @@ exports.validate = validate;
 function whatif(wrapper, params) {
     return __awaiter(this, void 0, void 0, function* () {
         const parameters = [
-            'deployment',
-            'group',
-            'what-if',
-            ...(params.managementGroup ? ['--management-group', params.managementGroup] : []),
-            ...(params.subscriptionId ? ['--subscription', params.subscriptionId] : []),
-            ...(params.resourceGroup ? ['--resource-group', params.resourceGroup] : []),
-            ...(params.deploymentName ? ['--name', params.deploymentName] : []),
-            ...(['--template-file', params.templateFile]),
-            ...(params.parametersFile ? ['--parameters', params.parametersFile] : []),
-            ...(['--output', 'json'])
+            "deployment",
+            "group",
+            "what-if",
+            ...(params.managementGroup
+                ? ["--management-group", params.managementGroup]
+                : []),
+            ...(params.subscriptionId ? ["--subscription", params.subscriptionId] : []),
+            ...(params.resourceGroup ? ["--resource-group", params.resourceGroup] : []),
+            ...(params.deploymentName ? ["--name", params.deploymentName] : []),
+            ...["--template-file", params.templateFile],
+            ...(params.parametersFile ? ["--parameters", params.parametersFile] : []),
+            ...["--output", "json"],
+            ...['--only-show-errors'],
         ];
         return yield wrapper.execute(parameters);
     });
@@ -99,9 +105,9 @@ function addOrUpdateComment(comment) {
         const { data: comments } = yield rest.issues.listComments({
             owner,
             repo,
-            issue_number,
+            issue_number
         });
-        const filteredComment = comments.filter(x => {
+        const filteredComment = comments.filter((x) => {
             var _a;
             return ((_a = x.user) === null || _a === void 0 ? void 0 : _a.login) === github_1.context.actor &&
                 x.body &&
@@ -154,10 +160,10 @@ const github_1 = __nccwpck_require__(5928);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const markdown = yield (0, run_1.validateAndGetMarkdown)(new azcli_1.AzCli(), {
-            subscriptionId: (0, core_1.getInput)('subscriptionId', { required: true }),
-            resourceGroup: (0, core_1.getInput)('resourceGroup', { required: true }),
-            templateFile: (0, core_1.getInput)('templateFile', { required: true }),
-            parametersFile: (0, core_1.getInput)('parametersFile', { required: true }),
+            subscriptionId: (0, core_1.getInput)("subscriptionId", { required: true }),
+            resourceGroup: (0, core_1.getInput)("resourceGroup", { required: true }),
+            templateFile: (0, core_1.getInput)("templateFile", { required: true }),
+            parametersFile: (0, core_1.getInput)("parametersFile", { required: true })
         });
         yield (0, github_1.addOrUpdateComment)(markdown);
     });
@@ -174,18 +180,22 @@ run();
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.combine = exports.getWhatIfTable = exports.getResultHeading = exports.getErrorTable = void 0;
-function getErrorTable(error) {
+function getErrorTable(errors) {
     var _a, _b, _c;
-    const errQueue = [error];
+    const errQueue = errors.slice();
     const rows = [];
     while (errQueue.length > 0) {
         const current = errQueue.shift();
         if (current.details) {
             errQueue.push(...current.details);
         }
-        rows.push([(_a = current.code) !== null && _a !== void 0 ? _a : '', (_b = current.message) !== null && _b !== void 0 ? _b : '', (_c = current.target) !== null && _c !== void 0 ? _c : '']);
+        rows.push([
+            (_a = current.code) !== null && _a !== void 0 ? _a : "",
+            (_b = current.message) !== null && _b !== void 0 ? _b : "",
+            (_c = current.target) !== null && _c !== void 0 ? _c : ""
+        ]);
     }
-    return getTable(['Code', 'Message', 'Target'], rows);
+    return getTable(["Code", "Message", "Target"], rows);
 }
 exports.getErrorTable = getErrorTable;
 function getResultHeading(title, success) {
@@ -200,20 +210,24 @@ function getResultHeading(title, success) {
 }
 exports.getResultHeading = getResultHeading;
 function getWhatIfTable(changes) {
-    return getTable(['Resource Id', 'Change Type', 'Change'], changes.map(x => [x.resourceId, x.changeType, `<pre>${JSON.stringify(x.delta)}</pre>`]));
+    return getTable(["Resource Id", "Change Type", "Change"], changes.map((x) => [
+        x.resourceId,
+        x.changeType,
+        `<pre>${JSON.stringify(x.delta)}</pre>`
+    ]));
 }
 exports.getWhatIfTable = getWhatIfTable;
 function combine(values) {
-    return values.join('\n\n');
+    return values.join("\n\n");
 }
 exports.combine = combine;
 function getTable(header, rows) {
     const mdRows = [
-        `| ${header.join(' | ')} |`,
-        `|${header.map(() => '-').join('|')} |`,
-        ...(rows.map(row => `| ${row.join(' | ')} |`))
+        `| ${header.join(" | ")} |`,
+        `|${header.map(() => "-").join("|")} |`,
+        ...rows.map((row) => `| ${row.join(" | ")} |`)
     ];
-    return mdRows.join('\n');
+    return mdRows.join("\n");
 }
 
 
@@ -239,20 +253,14 @@ const azcli_1 = __nccwpck_require__(6122);
 const markdown_1 = __nccwpck_require__(5821);
 function validateAndGetMarkdown(azCli, parameters) {
     return __awaiter(this, void 0, void 0, function* () {
-        const heading = 'Validate Results';
+        const heading = "Validate Results";
         const result = yield (0, azcli_1.validate)(azCli, parameters);
         if (result.exitCode !== 0) {
-            const errorJson = result.stderr.substring(result.stderr.indexOf('{'));
-            const error = JSON.parse(errorJson);
-            return (0, markdown_1.combine)([
-                (0, markdown_1.getResultHeading)(heading, false),
-                (0, markdown_1.getErrorTable)(error),
-            ]);
+            const errors = parseErrors(result.stderr);
+            return (0, markdown_1.combine)([(0, markdown_1.getResultHeading)(heading, false), (0, markdown_1.getErrorTable)(errors)]);
         }
         else {
-            return (0, markdown_1.combine)([
-                (0, markdown_1.getResultHeading)(heading, true),
-            ]);
+            return (0, markdown_1.combine)([(0, markdown_1.getResultHeading)(heading, true)]);
         }
     });
 }
@@ -260,26 +268,38 @@ exports.validateAndGetMarkdown = validateAndGetMarkdown;
 function whatIfAndGetMarkdown(azCli, parameters) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const heading = 'What-If Results';
+        const heading = "What-If Results";
         const result = yield (0, azcli_1.whatif)(azCli, parameters);
         if (result.exitCode !== 0) {
-            const errorJson = result.stderr.substring(result.stderr.indexOf('{'));
-            const error = JSON.parse(errorJson);
-            return (0, markdown_1.combine)([
-                (0, markdown_1.getResultHeading)(heading, false),
-                (0, markdown_1.getErrorTable)(error),
-            ]);
+            const errors = parseErrors(result.stderr);
+            return (0, markdown_1.combine)([(0, markdown_1.getResultHeading)(heading, false), (0, markdown_1.getErrorTable)(errors)]);
         }
         else {
             const response = JSON.parse(result.stdout);
             return (0, markdown_1.combine)([
                 (0, markdown_1.getResultHeading)(heading, true),
-                (0, markdown_1.getWhatIfTable)((_a = response.changes) !== null && _a !== void 0 ? _a : []),
+                (0, markdown_1.getWhatIfTable)((_a = response.changes) !== null && _a !== void 0 ? _a : [])
             ]);
         }
     });
 }
 exports.whatIfAndGetMarkdown = whatIfAndGetMarkdown;
+function parseErrors(stderr) {
+    if (stderr.startsWith('ERROR: ')) {
+        stderr = stderr.substring('ERROR: '.length);
+    }
+    const errors = [];
+    const split = stderr.split(/\r?\n/);
+    for (const line of split) {
+        if (line.startsWith('{')) {
+            errors.push(JSON.parse(line));
+        }
+        else if (/^(.+)\((\d+),(\d+)\)\s:\s(Error|Warning|Info)\s(.+):\s(.+)$/.test(line)) {
+            errors.push({ code: 'BicepBuildError', message: line });
+        }
+    }
+    return errors;
+}
 
 
 /***/ }),

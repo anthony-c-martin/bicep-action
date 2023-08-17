@@ -1,4 +1,4 @@
-name: 'build-test'
+name: Test
 on:
   pull_request:
 
@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          npm install
+          npm ci
       - run: |
           npm run all
   test: # make sure the action works on a clean machine without building
@@ -19,5 +19,5 @@ jobs:
         with:
           subscriptionId: d08e1a72-8180-4ed3-8125-9dff7376b0bd
           resourceGroup: ant-test
-          templateFile: __tests__/scenarios/static-error/main.bicep
-          parametersFile: __tests__/scenarios/static-error/main.bicepparam
+          templateFile: test/scenarios/static-error/main.bicep
+          parametersFile: test/scenarios/static-error/main.bicepparam
