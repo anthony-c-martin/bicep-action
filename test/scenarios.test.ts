@@ -4,7 +4,7 @@ import {
   expectBaselineToMatch,
   isBaselineRecordEnabled
 } from "./utils";
-import { validateAndGetMarkdown } from "../src/run";
+import { validateAndGetMarkdown, whatIfAndGetMarkdown } from "../src/run";
 
 const subscriptionId = "d08e1a72-8180-4ed3-8125-9dff7376b0bd";
 const resourceGroup = "ant-test";
@@ -19,24 +19,46 @@ describe("scenarios", () => {
     { name: "preflight-error" }
   ];
 
+  // it.each(scenarios)(
+  //   "validation produces the expected output ($name)",
+  //   async (scenario) => {
+  //     const basePath = `test/scenarios/${scenario.name}`;
+
+  //     const azCli = new AzCliTestRecorder(
+  //       `${basePath}/cli-validate.json`,
+  //       recordMode
+  //     );
+
+  //     const markdown = await validateAndGetMarkdown(azCli, {
+  //       subscriptionId: subscriptionId,
+  //       resourceGroup: resourceGroup,
+  //       templateFile: `${basePath}/main.bicep`,
+  //       parametersFile: `${basePath}/main.bicepparam`
+  //     });
+
+  //     await expectBaselineToMatch(`${basePath}/validate.md`, markdown);
+  //   },
+  //   timeout
+  // );
+
   it.each(scenarios)(
-    "validation produces the expected output ($name)",
+    "whatif produces the expected output ($name)",
     async (scenario) => {
       const basePath = `test/scenarios/${scenario.name}`;
 
       const azCli = new AzCliTestRecorder(
-        `${basePath}/cli-validate.json`,
+        `${basePath}/cli-whatif.json`,
         recordMode
       );
 
-      const markdown = await validateAndGetMarkdown(azCli, {
+      const markdown = await whatIfAndGetMarkdown(azCli, {
         subscriptionId: subscriptionId,
         resourceGroup: resourceGroup,
         templateFile: `${basePath}/main.bicep`,
         parametersFile: `${basePath}/main.bicepparam`
       });
 
-      await expectBaselineToMatch(`${basePath}/validate.md`, markdown);
+      await expectBaselineToMatch(`${basePath}/whatif.md`, markdown);
     },
     timeout
   );

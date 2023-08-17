@@ -1,0 +1,6 @@
+{
+  "arguments": "deployment group what-if --subscription d08e1a72-8180-4ed3-8125-9dff7376b0bd --resource-group ant-test --template-file test/scenarios/bicep-error/main.bicep --parameters test/scenarios/bicep-error/main.bicepparam --output json --only-show-errors --no-pretty-print",
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "ERROR: /Users/ant/Desktop/bicep-action/test/scenarios/bicep-error/main.bicep(1,5) : Error BCP028: Identifier \"foo\" is declared multiple times. Remove or rename the duplicates.\n/Users/ant/Desktop/bicep-action/test/scenarios/bicep-error/main.bicep(1,8) : Error BCP018: Expected the \"=\" character at this location.\n/Users/ant/Desktop/bicep-action/test/scenarios/bicep-error/main.bicep(3,5) : Error BCP028: Identifier \"foo\" is declared multiple times. Remove or rename the duplicates.\n/Users/ant/Desktop/bicep-action/test/scenarios/bicep-error/main.bicep(3,21) : Error BCP057: The name \"a\" does not exist in the current context.\n/Users/ant/Desktop/bicep-action/test/scenarios/bicep-error/main.bicep(5,21) : Error BCP062: The referenced declaration with name \"foo\" is not valid.\n"
+}

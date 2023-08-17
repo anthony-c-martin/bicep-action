@@ -47,7 +47,7 @@ function validate(wrapper, params) {
             ...["--template-file", params.templateFile],
             ...(params.parametersFile ? ["--parameters", params.parametersFile] : []),
             ...["--output", "json"],
-            ...['--only-show-errors'],
+            ...["--only-show-errors"]
         ];
         return yield wrapper.execute(parameters);
     });
@@ -68,7 +68,8 @@ function whatif(wrapper, params) {
             ...["--template-file", params.templateFile],
             ...(params.parametersFile ? ["--parameters", params.parametersFile] : []),
             ...["--output", "json"],
-            ...['--only-show-errors'],
+            ...["--only-show-errors"],
+            ...["--no-pretty-print"]
         ];
         return yield wrapper.execute(parameters);
     });
@@ -285,17 +286,17 @@ function whatIfAndGetMarkdown(azCli, parameters) {
 }
 exports.whatIfAndGetMarkdown = whatIfAndGetMarkdown;
 function parseErrors(stderr) {
-    if (stderr.startsWith('ERROR: ')) {
-        stderr = stderr.substring('ERROR: '.length);
+    if (stderr.startsWith("ERROR: ")) {
+        stderr = stderr.substring("ERROR: ".length);
     }
     const errors = [];
     const split = stderr.split(/\r?\n/);
     for (const line of split) {
-        if (line.startsWith('{')) {
+        if (line.startsWith("{")) {
             errors.push(JSON.parse(line));
         }
         else if (/^(.+)\((\d+),(\d+)\)\s:\s(Error|Warning|Info)\s(.+):\s(.+)$/.test(line)) {
-            errors.push({ code: 'BicepBuildError', message: line });
+            errors.push({ code: "BicepBuildError", message: line });
         }
     }
     return errors;

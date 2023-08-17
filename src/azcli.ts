@@ -63,7 +63,8 @@ export async function whatif(wrapper: AzCliWrapper, params: ActionParameters) {
     ...["--template-file", params.templateFile],
     ...(params.parametersFile ? ["--parameters", params.parametersFile] : []),
     ...["--output", "json"],
-    ...["--only-show-errors"]
+    ...["--only-show-errors"],
+    ...["--no-pretty-print"]
   ];
 
   return await wrapper.execute(parameters);
