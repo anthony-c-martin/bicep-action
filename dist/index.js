@@ -160,13 +160,30 @@ const run_1 = __nccwpck_require__(7884);
 const github_1 = __nccwpck_require__(5928);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const markdown = yield (0, run_1.validateAndGetMarkdown)(new azcli_1.AzCli(), {
-            subscriptionId: (0, core_1.getInput)("subscriptionId", { required: true }),
-            resourceGroup: (0, core_1.getInput)("resourceGroup", { required: true }),
-            templateFile: (0, core_1.getInput)("templateFile", { required: true }),
-            parametersFile: (0, core_1.getInput)("parametersFile", { required: true })
-        });
-        yield (0, github_1.addOrUpdateComment)(markdown);
+        let runWhatIf;
+        try {
+            runWhatIf = (0, core_1.getBooleanInput)('whatIf');
+        }
+        catch (err) {
+            runWhatIf = false;
+        }
+        if (runWhatIf) {
+            const markdown = yield (0, run_1.whatIfAndGetMarkdown)(new azcli_1.AzCli(), {
+                subscriptionId: (0, core_1.getInput)("subscriptionId", { required: true }),
+                resourceGroup: (0, core_1.getInput)("resourceGroup", { required: true }),
+                templateFile: (0, core_1.getInput)("templateFile", { required: true }),
+                parametersFile: (0, core_1.getInput)("parametersFile", { required: true })
+            });
+        }
+        else {
+            const markdown = yield (0, run_1.validateAndGetMarkdown)(new azcli_1.AzCli(), {
+                subscriptionId: (0, core_1.getInput)("subscriptionId", { required: true }),
+                resourceGroup: (0, core_1.getInput)("resourceGroup", { required: true }),
+                templateFile: (0, core_1.getInput)("templateFile", { required: true }),
+                parametersFile: (0, core_1.getInput)("parametersFile", { required: true })
+            });
+            yield (0, github_1.addOrUpdateComment)(markdown);
+        }
     });
 }
 run();
@@ -180,11 +197,11 @@ run();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.combine = exports.getWhatIfTable = exports.getResultHeading = exports.getErrorTable = void 0;
+exports.convertTableToString = exports.combine = exports.getWhatIfTable = exports.getResultHeading = exports.getErrorTable = void 0;
 function getErrorTable(errors) {
     var _a, _b, _c;
     const errQueue = errors.slice();
-    const rows = [];
+    const rows = [["Code", "Message", "Target"]];
     while (errQueue.length > 0) {
         const current = errQueue.shift();
         if (current.details) {
@@ -196,7 +213,7 @@ function getErrorTable(errors) {
             (_c = current.target) !== null && _c !== void 0 ? _c : ""
         ]);
     }
-    return getTable(["Code", "Message", "Target"], rows);
+    return rows;
 }
 exports.getErrorTable = getErrorTable;
 function getResultHeading(title, success) {
@@ -211,25 +228,29 @@ function getResultHeading(title, success) {
 }
 exports.getResultHeading = getResultHeading;
 function getWhatIfTable(changes) {
-    return getTable(["Resource Id", "Change Type", "Change"], changes.map((x) => [
+    let rows = changes.map((x) => [
         x.resourceId,
         x.changeType,
         `<pre>${JSON.stringify(x.delta)}</pre>`
-    ]));
+    ]);
+    rows.unshift(["Resource Id", "Change Type", "Change"]);
+    return rows;
 }
 exports.getWhatIfTable = getWhatIfTable;
 function combine(values) {
     return values.join("\n\n");
 }
 exports.combine = combine;
-function getTable(header, rows) {
+function convertTableToString(rows) {
+    let header = rows[0];
     const mdRows = [
         `| ${header.join(" | ")} |`,
         `|${header.map(() => "-").join("|")} |`,
-        ...rows.map((row) => `| ${row.join(" | ")} |`)
+        ...rows.slice(1).map((row) => `| ${row.join(" | ")} |`)
     ];
     return mdRows.join("\n");
 }
+exports.convertTableToString = convertTableToString;
 
 
 /***/ }),
@@ -250,6 +271,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.whatIfAndGetMarkdown = exports.validateAndGetMarkdown = void 0;
+const core_1 = __nccwpck_require__(2186);
 const azcli_1 = __nccwpck_require__(6122);
 const markdown_1 = __nccwpck_require__(5821);
 function validateAndGetMarkdown(azCli, parameters) {
@@ -258,7 +280,7 @@ function validateAndGetMarkdown(azCli, parameters) {
         const result = yield (0, azcli_1.validate)(azCli, parameters);
         if (result.exitCode !== 0) {
             const errors = parseErrors(result.stderr);
-            return (0, markdown_1.combine)([(0, markdown_1.getResultHeading)(heading, false), (0, markdown_1.getErrorTable)(errors)]);
+            return (0, markdown_1.combine)([(0, markdown_1.getResultHeading)(heading, false), (0, markdown_1.convertTableToString)((0, markdown_1.getErrorTable)(errors))]);
         }
         else {
             return (0, markdown_1.combine)([(0, markdown_1.getResultHeading)(heading, true)]);
@@ -271,17 +293,23 @@ function whatIfAndGetMarkdown(azCli, parameters) {
     return __awaiter(this, void 0, void 0, function* () {
         const heading = "What-If Results";
         const result = yield (0, azcli_1.whatif)(azCli, parameters);
+        let resultHeading, body;
         if (result.exitCode !== 0) {
+            resultHeading = (0, markdown_1.getResultHeading)(heading, false);
             const errors = parseErrors(result.stderr);
-            return (0, markdown_1.combine)([(0, markdown_1.getResultHeading)(heading, false), (0, markdown_1.getErrorTable)(errors)]);
+            body = (0, markdown_1.getErrorTable)(errors);
         }
         else {
+            resultHeading = (0, markdown_1.getResultHeading)(heading, true);
             const response = JSON.parse(result.stdout);
-            return (0, markdown_1.combine)([
-                (0, markdown_1.getResultHeading)(heading, true),
-                (0, markdown_1.getWhatIfTable)((_a = response.changes) !== null && _a !== void 0 ? _a : [])
-            ]);
+            body = (0, markdown_1.getWhatIfTable)((_a = response.changes) !== null && _a !== void 0 ? _a : []);
         }
+        yield core_1.summary
+            .addHeading(resultHeading)
+            .addTable(body)
+            .addLink('View staging deployment!', 'https://github.com')
+            .write();
+        return (0, markdown_1.combine)([resultHeading, (0, markdown_1.convertTableToString)(body)]);
     });
 }
 exports.whatIfAndGetMarkdown = whatIfAndGetMarkdown;

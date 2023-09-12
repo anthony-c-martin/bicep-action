@@ -14,6 +14,10 @@ inputs:
   parametersFile:
     required: true
     description: 'Parameters File'
+  whatIf:
+    required: false
+    description: 'Run what-if'
+    default: false
 runs:
   using: 'node16'
   main: 'dist/index.js'
