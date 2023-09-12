@@ -1,4 +1,4 @@
-import { it, describe } from "@jest/globals";
+import { describe, it } from "@jest/globals";
 import {
   AzCliTestRecorder,
   expectBaselineToMatch,
@@ -56,7 +56,7 @@ describe("scenarios", () => {
         resourceGroup: resourceGroup,
         templateFile: `${basePath}/main.bicep`,
         parametersFile: `${basePath}/main.bicepparam`
-      });
+      }, async (heading: string, body: string[][]) => {});
 
       await expectBaselineToMatch(`${basePath}/whatif.md`, markdown);
     },

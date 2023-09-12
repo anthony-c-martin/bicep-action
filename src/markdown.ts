@@ -45,7 +45,7 @@ export function combine(values: string[]) {
 }
 
 export function convertTableToString(rows: string[][]) {
-  const header = rows[0]
+  const header = rows[0];
   const mdRows = [
     `| ${header.join(" | ")} |`,
     `|${header.map(() => "-").join("|")} |`,

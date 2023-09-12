@@ -27,14 +27,15 @@ export async function validateAndGetMarkdown(
 
 export async function whatIfAndGetMarkdown(
   azCli: AzCliWrapper,
-  parameters: ActionParameters
+  parameters: ActionParameters,
+  writeSummary: (heading: string, body: string[][]) => Promise<void>
 ) {
   const heading = "What-If Results";
   const result = await whatif(azCli, parameters);
 
-  console.log(result.exitCode)
-  console.log(result.stdout)
-  console.log(result.stderr)
+  console.log(`exitCode: ${result.exitCode}`)
+  console.log(`stdout: ${result.stdout}`)
+  console.log(`stderr: ${result.stderr}`)
 
   let resultHeading, body;
   if (result.exitCode !== 0) {
@@ -49,10 +50,7 @@ export async function whatIfAndGetMarkdown(
     body = getWhatIfTable(response.changes ?? [])
   }
 
-  await summary
-    .addHeading(resultHeading)
-    .addTable(body)
-    .write()
+  await writeSummary(resultHeading, body);
   
   return combine([resultHeading, convertTableToString(body)]);
 }
