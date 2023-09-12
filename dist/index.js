@@ -168,7 +168,7 @@ function run() {
             runWhatIf = false;
         }
         if (runWhatIf) {
-            const markdown = yield (0, run_1.whatIfAndGetMarkdown)(new azcli_1.AzCli(), {
+            yield (0, run_1.whatIfAndGetMarkdown)(new azcli_1.AzCli(), {
                 subscriptionId: (0, core_1.getInput)("subscriptionId", { required: true }),
                 resourceGroup: (0, core_1.getInput)("resourceGroup", { required: true }),
                 templateFile: (0, core_1.getInput)("templateFile", { required: true }),
@@ -228,7 +228,7 @@ function getResultHeading(title, success) {
 }
 exports.getResultHeading = getResultHeading;
 function getWhatIfTable(changes) {
-    let rows = changes.map((x) => [
+    const rows = changes.map((x) => [
         x.resourceId,
         x.changeType,
         `<pre>${JSON.stringify(x.delta)}</pre>`
@@ -242,7 +242,7 @@ function combine(values) {
 }
 exports.combine = combine;
 function convertTableToString(rows) {
-    let header = rows[0];
+    const header = rows[0];
     const mdRows = [
         `| ${header.join(" | ")} |`,
         `|${header.map(() => "-").join("|")} |`,
@@ -293,6 +293,9 @@ function whatIfAndGetMarkdown(azCli, parameters) {
     return __awaiter(this, void 0, void 0, function* () {
         const heading = "What-If Results";
         const result = yield (0, azcli_1.whatif)(azCli, parameters);
+        console.log(result.exitCode);
+        console.log(result.stdout);
+        console.log(result.stderr);
         let resultHeading, body;
         if (result.exitCode !== 0) {
             resultHeading = (0, markdown_1.getResultHeading)(heading, false);
@@ -307,7 +310,6 @@ function whatIfAndGetMarkdown(azCli, parameters) {
         yield core_1.summary
             .addHeading(resultHeading)
             .addTable(body)
-            .addLink('View staging deployment!', 'https://github.com')
             .write();
         return (0, markdown_1.combine)([resultHeading, (0, markdown_1.convertTableToString)(body)]);
     });

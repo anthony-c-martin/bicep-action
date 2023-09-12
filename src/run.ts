@@ -32,6 +32,10 @@ export async function whatIfAndGetMarkdown(
   const heading = "What-If Results";
   const result = await whatif(azCli, parameters);
 
+  console.log(result.exitCode)
+  console.log(result.stdout)
+  console.log(result.stderr)
+
   let resultHeading, body;
   if (result.exitCode !== 0) {
     resultHeading = getResultHeading(heading, false)
@@ -48,7 +52,6 @@ export async function whatIfAndGetMarkdown(
   await summary
     .addHeading(resultHeading)
     .addTable(body)
-    .addLink('View staging deployment!', 'https://github.com')
     .write()
   
   return combine([resultHeading, convertTableToString(body)]);
