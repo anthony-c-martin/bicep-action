@@ -1,4 +1,3 @@
-import { summary } from "@actions/core";
 import { ActionParameters, AzCliWrapper, validate, whatif } from "./azcli";
 import {
   combine,

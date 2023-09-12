@@ -173,7 +173,7 @@ function run() {
                 resourceGroup: (0, core_1.getInput)("resourceGroup", { required: true }),
                 templateFile: (0, core_1.getInput)("templateFile", { required: true }),
                 parametersFile: (0, core_1.getInput)("parametersFile", { required: true })
-            });
+            }, writeSummary);
         }
         else {
             const markdown = yield (0, run_1.validateAndGetMarkdown)(new azcli_1.AzCli(), {
@@ -184,6 +184,14 @@ function run() {
             });
             yield (0, github_1.addOrUpdateComment)(markdown);
         }
+    });
+}
+function writeSummary(heading, body) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield core_1.summary
+            .addHeading(heading)
+            .addTable(body)
+            .write();
     });
 }
 run();
@@ -271,7 +279,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.whatIfAndGetMarkdown = exports.validateAndGetMarkdown = void 0;
-const core_1 = __nccwpck_require__(2186);
 const azcli_1 = __nccwpck_require__(6122);
 const markdown_1 = __nccwpck_require__(5821);
 function validateAndGetMarkdown(azCli, parameters) {
@@ -288,14 +295,14 @@ function validateAndGetMarkdown(azCli, parameters) {
     });
 }
 exports.validateAndGetMarkdown = validateAndGetMarkdown;
-function whatIfAndGetMarkdown(azCli, parameters) {
+function whatIfAndGetMarkdown(azCli, parameters, writeSummary) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const heading = "What-If Results";
         const result = yield (0, azcli_1.whatif)(azCli, parameters);
-        console.log(result.exitCode);
-        console.log(result.stdout);
-        console.log(result.stderr);
+        console.log(`exitCode: ${result.exitCode}`);
+        console.log(`stdout: ${result.stdout}`);
+        console.log(`stderr: ${result.stderr}`);
         let resultHeading, body;
         if (result.exitCode !== 0) {
             resultHeading = (0, markdown_1.getResultHeading)(heading, false);
@@ -307,10 +314,7 @@ function whatIfAndGetMarkdown(azCli, parameters) {
             const response = JSON.parse(result.stdout);
             body = (0, markdown_1.getWhatIfTable)((_a = response.changes) !== null && _a !== void 0 ? _a : []);
         }
-        yield core_1.summary
-            .addHeading(resultHeading)
-            .addTable(body)
-            .write();
+        yield writeSummary(resultHeading, body);
         return (0, markdown_1.combine)([resultHeading, (0, markdown_1.convertTableToString)(body)]);
     });
 }
