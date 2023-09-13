@@ -19,27 +19,27 @@ describe("scenarios", () => {
     { name: "preflight-error" }
   ];
 
-  // it.each(scenarios)(
-  //   "validation produces the expected output ($name)",
-  //   async (scenario) => {
-  //     const basePath = `test/scenarios/${scenario.name}`;
+  it.each(scenarios)(
+    "validation produces the expected output ($name)",
+    async (scenario) => {
+      const basePath = `test/scenarios/${scenario.name}`;
 
-  //     const azCli = new AzCliTestRecorder(
-  //       `${basePath}/cli-validate.json`,
-  //       recordMode
-  //     );
+      const azCli = new AzCliTestRecorder(
+        `${basePath}/cli-validate.json`,
+        recordMode
+      );
 
-  //     const markdown = await validateAndGetMarkdown(azCli, {
-  //       subscriptionId: subscriptionId,
-  //       resourceGroup: resourceGroup,
-  //       templateFile: `${basePath}/main.bicep`,
-  //       parametersFile: `${basePath}/main.bicepparam`
-  //     });
+      const markdown = await validateAndGetMarkdown(azCli, {
+        subscriptionId: subscriptionId,
+        resourceGroup: resourceGroup,
+        templateFile: `${basePath}/main.bicep`,
+        parametersFile: `${basePath}/main.bicepparam`
+      });
 
-  //     await expectBaselineToMatch(`${basePath}/validate.md`, markdown);
-  //   },
-  //   timeout
-  // );
+      await expectBaselineToMatch(`${basePath}/validate.md`, markdown);
+    },
+    timeout
+  );
 
   it.each(scenarios)(
     "whatif produces the expected output ($name)",
@@ -56,7 +56,7 @@ describe("scenarios", () => {
         resourceGroup: resourceGroup,
         templateFile: `${basePath}/main.bicep`,
         parametersFile: `${basePath}/main.bicepparam`
-      }, async (heading: string, body: string[][]) => {});
+      });
 
       await expectBaselineToMatch(`${basePath}/whatif.md`, markdown);
     },
