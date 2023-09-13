@@ -2,6 +2,10 @@ name: 'Bicep Action'
 description: 'Testing with Bicep Action'
 author: 'Anthony Martin'
 inputs:
+  repo-token:
+    description: "A GitHub token for API access. Defaults to {{ github.token }}."
+    default: "${{ github.token }}"
+    required: true
   subscriptionId:
     required: true
     description: 'Subscription Id'
@@ -14,6 +18,10 @@ inputs:
   parametersFile:
     required: true
     description: 'Parameters File'
+  whatIf:
+    required: false
+    description: 'Run what-if'
+    default: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

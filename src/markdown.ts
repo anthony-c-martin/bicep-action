@@ -2,7 +2,7 @@ import { ErrorResponse, WhatIfChange } from "@azure/arm-resources";
 
 export function getErrorTable(errors: ErrorResponse[]) {
   const errQueue = errors.slice();
-  const rows: string[][] = [];
+  const rows: string[][] = [["Code", "Message", "Target"]];
 
   while (errQueue.length > 0) {
     const current = errQueue.shift()!;
@@ -17,7 +17,7 @@ export function getErrorTable(errors: ErrorResponse[]) {
     ]);
   }
 
-  return getTable(["Code", "Message", "Target"], rows);
+  return rows;
 }
 
 export function getResultHeading(title: string, success: boolean) {
@@ -31,25 +31,25 @@ export function getResultHeading(title: string, success: boolean) {
 }
 
 export function getWhatIfTable(changes: WhatIfChange[]) {
-  return getTable(
-    ["Resource Id", "Change Type", "Change"],
-    changes.map((x) => [
-      x.resourceId,
-      x.changeType,
-      `<pre>${JSON.stringify(x.delta)}</pre>`
-    ])
-  );
+  const rows = changes.map((x) => [
+    x.resourceId,
+    x.changeType,
+    `<pre>${JSON.stringify(x.delta)}</pre>`
+  ]);
+  rows.unshift(["Resource Id", "Change Type", "Change"]);
+  return rows;
 }
 
 export function combine(values: string[]) {
   return values.join("\n\n");
 }
 
-function getTable(header: string[], rows: string[][]) {
+export function convertTableToString(rows: string[][]) {
+  const header = rows[0];
   const mdRows = [
     `| ${header.join(" | ")} |`,
     `|${header.map(() => "-").join("|")} |`,
-    ...rows.map((row) => `| ${row.join(" | ")} |`)
+    ...rows.slice(1).map((row) => `| ${row.join(" | ")} |`)
   ];
 
   return mdRows.join("\n");

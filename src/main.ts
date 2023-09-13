@@ -1,17 +1,16 @@
-import { getInput } from "@actions/core";
+import { summary } from "@actions/core";
 import { AzCli } from "./azcli";
-import { validateAndGetMarkdown } from "./run";
-import { addOrUpdateComment } from "./github";
+import { validateAndGetMarkdown, whatIfAndGetMarkdown } from "./run";
+import { getInputs } from "./inputs";
 
 async function run(): Promise<void> {
-  const markdown = await validateAndGetMarkdown(new AzCli(), {
-    subscriptionId: getInput("subscriptionId", { required: true }),
-    resourceGroup: getInput("resourceGroup", { required: true }),
-    templateFile: getInput("templateFile", { required: true }),
-    parametersFile: getInput("parametersFile", { required: true })
-  });
+  const inputs = await getInputs();
 
-  await addOrUpdateComment(markdown);
+  const markdown = inputs.runWhatIf ?
+    await whatIfAndGetMarkdown(new AzCli(), inputs) :
+    await validateAndGetMarkdown(new AzCli(), inputs);
+
+  summary.addRaw(markdown).write();
 }
 
 run();

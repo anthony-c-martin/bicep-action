@@ -1,6 +1,7 @@
 import { ActionParameters, AzCliWrapper, validate, whatif } from "./azcli";
 import {
   combine,
+  convertTableToString,
   getErrorTable,
   getResultHeading,
   getWhatIfTable
@@ -17,7 +18,7 @@ export async function validateAndGetMarkdown(
   if (result.exitCode !== 0) {
     const errors = parseErrors(result.stderr);
 
-    return combine([getResultHeading(heading, false), getErrorTable(errors)]);
+    return combine([getResultHeading(heading, false), convertTableToString(getErrorTable(errors))]);
   } else {
     return combine([getResultHeading(heading, true)]);
   }
@@ -30,18 +31,20 @@ export async function whatIfAndGetMarkdown(
   const heading = "What-If Results";
   const result = await whatif(azCli, parameters);
 
+  let resultHeading, body;
   if (result.exitCode !== 0) {
-    const errors = parseErrors(result.stderr);
+    resultHeading = getResultHeading(heading, false)
 
-    return combine([getResultHeading(heading, false), getErrorTable(errors)]);
+    const errors = parseErrors(result.stderr);
+    body = getErrorTable(errors);
   } else {
+    resultHeading = getResultHeading(heading, true)
     const response: WhatIfOperationResult = JSON.parse(result.stdout);
 
-    return combine([
-      getResultHeading(heading, true),
-      getWhatIfTable(response.changes ?? [])
-    ]);
+    body = getWhatIfTable(response.changes ?? [])
   }
+  
+  return combine([resultHeading, convertTableToString(body)]);
 }
 
 function parseErrors(stderr: string) {
