@@ -1,0 +1,7 @@
+{
+    "subscriptionId": "d08e1a72-8180-4ed3-8125-9dff7376b0bd",
+    "resourceGroup": "bicep-action-test",
+    "name": "test-deploy",
+    "bicepVersion": "0.24.24",
+    "bicepParamsFile": "main.bicepparam"
+}

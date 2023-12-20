@@ -1,27 +1,17 @@
 name: 'Bicep Action'
-description: 'Testing with Bicep Action'
+description: 'Runs various Bicep deployment scenarios'
 author: 'Anthony Martin'
 inputs:
   repo-token:
     description: "A GitHub token for API access. Defaults to {{ github.token }}."
     default: "${{ github.token }}"
     required: true
-  subscriptionId:
+  config:
+    description: "Path to the JSON configuration file"
     required: true
-    description: 'Subscription Id'
-  resourceGroup:
+  action:
+    description: "The action to perform"
     required: true
-    description: 'Resource Group'
-  templateFile:
-    required: true
-    description: 'Template File'
-  parametersFile:
-    required: true
-    description: 'Parameters File'
-  whatIf:
-    required: false
-    description: 'Run what-if'
-    default: false
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

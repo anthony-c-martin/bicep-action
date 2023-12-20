@@ -33,7 +33,5 @@ jobs:
       - name: Live Test
         uses: ./
         with:
-          subscriptionId: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          resourceGroup: ${{ vars.AZURE_RESOURCE_GROUP }}
-          templateFile: test/scenarios/static-error/main.bicep
-          parametersFile: test/scenarios/static-error/main.bicepparam
+          action: validate
+          config: test/live/config.json
